@@ -1,52 +1,202 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>HVAC Calculator Florida</title>
-  <style>
-    body { font-family: Arial; text-align: center; padding: 20px; }
-    input, button { padding: 10px; margin: 10px; font-size: 16px; }
-    .result { font-size: 20px; margin-top: 20px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deluxe Air HVAC Calculator</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  margin: 0;
+  padding: 20px;
+  color: #1f2937;
+}
+
+.card {
+  max-width: 520px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+
+h1 {
+  text-align: center;
+  color: #0f172a;
+}
+
+.brand {
+  text-align: center;
+  font-weight: bold;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-top: 14px;
+}
+
+input, select, button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 6px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 16px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  font-weight: bold;
+  margin-top: 22px;
+}
+
+.result {
+  margin-top: 25px;
+  padding: 18px;
+  border-radius: 14px;
+  background: #e0f2fe;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.warning {
+  background: #fff7ed;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 14px;
+}
+</style>
 </head>
+
 <body>
 
+<div class="card">
   <h1>Calculadora HVAC Florida</h1>
+  <div class="brand">Deluxe Air Pro Solutions</div>
 
-  <label>Área (sqft):</label><br>
-  <input type="number" id="area"><br>
+  <label>Área del cuarto (sqft)</label>
+  <input type="number" id="area" placeholder="Ej: 600">
 
-  <label>Altura techo (ft):</label><br>
-  <input type="number" id="height" value="8"><br>
+  <label>Altura del techo (ft)</label>
+  <input type="number" id="height" value="8">
 
-  <button onclick="calcular()">Calcular</button>
+  <label>Tipo de aislamiento</label>
+  <select id="insulation">
+    <option value="0.95">Bueno</option>
+    <option value="1.00" selected>Normal</option>
+    <option value="1.15">Pobre</option>
+  </select>
 
-  <div class="result" id="resultado"></div>
+  <label>Sol directo</label>
+  <select id="sun">
+    <option value="0.95">Poco sol</option>
+    <option value="1.00" selected>Normal</option>
+    <option value="1.15">Mucho sol</option>
+  </select>
 
-  <script>
-    function calcular() {
-      let area = document.getElementById("area").value;
-      let height = document.getElementById("height").value;
+  <label>Cantidad de personas normalmente</label>
+  <input type="number" id="people" value="2">
 
-      let btu = area * 25; // base Florida
-      let tons = btu / 12000;
+  <label>Tipo de equipo</label>
+  <select id="brand">
+    <option value="economico">Económico</option>
+    <option value="medio" selected>Gama media</option>
+    <option value="premium">Premium</option>
+  </select>
 
-      let modelo = "";
+  <button onclick="calcular()">Calcular capacidad</button>
 
-      if (tons <= 1) modelo = "12,000 BTU (1 Ton)";
-      else if (tons <= 1.5) modelo = "18,000 BTU (1.5 Ton)";
-      else if (tons <= 2) modelo = "24,000 BTU (2 Ton)";
-      else if (tons <= 3) modelo = "36,000 BTU (3 Ton)";
-      else modelo = "Sistema mayor o multi-zone";
+  <div class="result" id="resultado">
+    Completa los datos y presiona calcular.
+  </div>
+</div>
 
-      let precio = tons * 1200 + 1500;
+<script>
+function calcular() {
+  let area = Number(document.getElementById("area").value);
+  let height = Number(document.getElementById("height").value);
+  let insulation = Number(document.getElementById("insulation").value);
+  let sun = Number(document.getElementById("sun").value);
+  let people = Number(document.getElementById("people").value);
+  let brand = document.getElementById("brand").value;
 
-      document.getElementById("resultado").innerHTML =
-        "Capacidad recomendada: " + modelo +
-        "<br>BTU estimados: " + Math.round(btu) +
-        "<br>Precio estimado: $" + Math.round(precio);
-    }
-  </script>
+  if (!area || area <= 0) {
+    document.getElementById("resultado").innerHTML = "⚠️ Entra un área válida.";
+    return;
+  }
+
+  let baseBTU = area * 25;
+
+  if (height > 8) {
+    baseBTU *= (height / 8);
+  }
+
+  let peopleBTU = Math.max(0, people - 2) * 600;
+  let floridaHumidityFactor = 1.10;
+
+  let finalBTU = (baseBTU + peopleBTU) * insulation * sun * floridaHumidityFactor;
+
+  let capacity = "";
+  let equipmentBTU = 0;
+
+  if (finalBTU <= 12000) {
+    capacity = "12,000 BTU / 1 Ton";
+    equipmentBTU = 12000;
+  } else if (finalBTU <= 18000) {
+    capacity = "18,000 BTU / 1.5 Ton";
+    equipmentBTU = 18000;
+  } else if (finalBTU <= 24000) {
+    capacity = "24,000 BTU / 2 Ton";
+    equipmentBTU = 24000;
+  } else if (finalBTU <= 36000) {
+    capacity = "36,000 BTU / 3 Ton";
+    equipmentBTU = 36000;
+  } else {
+    capacity = "Sistema multi-zone o cálculo Manual J recomendado";
+    equipmentBTU = finalBTU;
+  }
+
+  let brandName = "";
+  let priceMin = 0;
+  let priceMax = 0;
+
+  if (brand === "economico") {
+    brandName = "ComfortStar / Cooper & Hunter / Pioneer";
+    priceMin = equipmentBTU * 0.13 + 1200;
+    priceMax = equipmentBTU * 0.17 + 1800;
+  }
+
+  if (brand === "medio") {
+    brandName = "Daikin / Gree / Bosch";
+    priceMin = equipmentBTU * 0.17 + 1800;
+    priceMax = equipmentBTU * 0.22 + 2600;
+  }
+
+  if (brand === "premium") {
+    brandName = "Mitsubishi / Fujitsu / LG";
+    priceMin = equipmentBTU * 0.22 + 2500;
+    priceMax = equipmentBTU * 0.30 + 3500;
+  }
+
+  document.getElementById("resultado").innerHTML =
+    "<strong>Resultado profesional estimado:</strong><br><br>" +
+    "✅ BTU calculados: <strong>" + Math.round(finalBTU).toLocaleString() + " BTU</strong><br>" +
+    "✅ Capacidad recomendada: <strong>" + capacity + "</strong><br>" +
+    "✅ Marcas sugeridas: <strong>" + brandName + "</strong><br>" +
+    "💰 Precio instalado estimado: <strong>$" + Math.round(priceMin).toLocaleString() +
+    " - $" + Math.round(priceMax).toLocaleString() + "</strong><br>" +
+    "<div class='warning'>⚠️ Estimado preliminar. Para instalación real se recomienda revisar ventanas, orientación solar, ductos, carga térmica y código local.</div>";
+}
+</script>
 
 </body>
 </html>
