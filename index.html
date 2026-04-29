@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>HVAC Calculator Florida</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding: 20px; }
+    input, button { padding: 10px; margin: 10px; font-size: 16px; }
+    .result { font-size: 20px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+
+  <h1>Calculadora HVAC Florida</h1>
+
+  <label>Área (sqft):</label><br>
+  <input type="number" id="area"><br>
+
+  <label>Altura techo (ft):</label><br>
+  <input type="number" id="height" value="8"><br>
+
+  <button onclick="calcular()">Calcular</button>
+
+  <div class="result" id="resultado"></div>
+
+  <script>
+    function calcular() {
+      let area = document.getElementById("area").value;
+      let height = document.getElementById("height").value;
+
+      let btu = area * 25; // base Florida
+      let tons = btu / 12000;
+
+      let modelo = "";
+
+      if (tons <= 1) modelo = "12,000 BTU (1 Ton)";
+      else if (tons <= 1.5) modelo = "18,000 BTU (1.5 Ton)";
+      else if (tons <= 2) modelo = "24,000 BTU (2 Ton)";
+      else if (tons <= 3) modelo = "36,000 BTU (3 Ton)";
+      else modelo = "Sistema mayor o multi-zone";
+
+      let precio = tons * 1200 + 1500;
+
+      document.getElementById("resultado").innerHTML =
+        "Capacidad recomendada: " + modelo +
+        "<br>BTU estimados: " + Math.round(btu) +
+        "<br>Precio estimado: $" + Math.round(precio);
+    }
+  </script>
+
+</body>
+</html>
